@@ -1,24 +1,19 @@
-//app.js
 App({
 
-    globalData:{
-        url: "https://weixin.nuanwan.wekeji.com"
+    globalData: {
+        deviceInfo: {}
     },
-
     onLaunch: function() {
-        console.log("onlaunch")
-    },
-
-    onShow: function(options) {
-        console.log("onshow")
-        console.log(options)
-    },
-
-    onHide: function() {
-        console.log("onHide")
-    },
-
-    calculate: function(a,b) {
-        return a + b;
+        try {
+            var localInfo = wx.getStorageSync("deviceInfo");
+            if(!localInfo) {
+                var res = wx.getSystemInfoSync();
+                wx.setStorageSync("deviceInfo",res);
+                this.globalData.deviceInfo = res;
+            } else {
+                this.globalData.deviceInfo = localInfo;
+            }
+            
+        } catch(e) {}
     }
 })

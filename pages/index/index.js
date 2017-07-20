@@ -1,43 +1,106 @@
-    Page({
-        data: {
-           
+var app = getApp(),
+    deviceInfo = app.globalData.deviceInfo;
+Page({
+    data: {
+        latitude: "",
+        longitude: "",
+        controls: [{
+            id: 1,
+            iconPath: '/resource/pin.png',
+            position: {
+                left: deviceInfo.windowWidth/2 - 10,
+                top: (deviceInfo.windowHeight - 42)/2 - 30,
+                width: 20,
+                height: 30
+            }
+        },{
+            id: 2,
+            iconPath: '/resource/center.png',
+            position: {
+                left: 20,
+                top: deviceInfo.windowHeight - 100,
+                width: 30,
+                height: 30
+            },
+            clickable: true
+        }],
+        markers: []
     },
-    onLoad: function () {
-        console.log("page onload")
+
+    staticData: {
+        markersInfo: []
     },
-    onReady: function() {
-        console.log("page onReady")
+
+    onReady: function (e) {
+        this.mapCtx = wx.createMapContext('map')
     },
+
     onShow: function() {
-        console.log("page onshow")
+        wx.getLocation({
+            type: 'gcj02',
+            success: this.handleGetlocationSucc.bind(this)
+        });
+        wx.request({
+                url: 'https://nuanwan.wekeji.cn/student/index.php/trade/get_list', 
+                data: {},
+                method: "GET",
+                header: {
+                    'content-type': 'application/x-www-form-urlencoded'
+                },
+                success: this.handleGetMarkersSucc.bind(this)
+            })
     },
-    onHide: function() {
-        console.log("page onHide")
+
+    handleGetMarkersSucc: function(res) {
+        this.staticData.markersInfo = res.data.data;
+        console.log(this.staticData.markersInfo)
+        var markers = res.data.data,
+            l = markers.length,
+            results = [];
+        for(var i=0;i<l;i++){
+            var item = markers[i];
+            results.push({
+                iconPath: "/resource/"+item.type+".png",
+                id: i,
+                latitude: item.latitude,
+                longitude: item.longitude,
+                width: 30,
+                height: 30
+            })
+        }
+        this.setData({
+            markers: results
+        })
     },
-    onunload: function() {
-        console.log("page onunload")
+
+    handleGetlocationSucc: function(res) {
+        this.setData({
+            latitude: res.latitude,
+            longitude: res.longitude
+        })
     },
-    onPullDownRefresh: function() {
-        console.log("123")
-    },
-    onReachBottom: function() {
-        console.log("456")
-    },
+
     onShareAppMessage: function () {
         return {
             title: '最实用闲置家居平台',
             path: '/pages/index/index'
         }
     },
-    handletap: function() {
-        wx.getLocation({
-            type: 'wgs84',
-            success: function(res) {
-                console.log(res)
-            }
-        })
+
+    handleControltap:  function(e) {
+        var id = e.controlId;
+        if(id = 2) {
+            this.mapCtx.moveToLocation();
+        }
     },
 
+    bindMarkerTap: function(e) {
+        var id = e.markerId,
+            infoid = this.staticData.markersInfo[id].id;
+            wx.navigateTo({
+                url: '/pages/detail/detail?id='+infoid
+            })
+    },
 
 
 })
