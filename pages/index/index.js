@@ -41,19 +41,19 @@ Page({
             success: this.handleGetlocationSucc.bind(this)
         });
         wx.request({
-                url: 'https://nuanwan.wekeji.cn/student/index.php/trade/get_list', 
-                data: {},
-                method: "GET",
-                header: {
-                    'content-type': 'application/x-www-form-urlencoded'
-                },
-                success: this.handleGetMarkersSucc.bind(this)
-            })
+            url: 'https://nuanwan.wekeji.cn/student/index.php/trade/get_list', 
+            data: {},
+            method: "GET",
+            header: {
+                'content-type': 'application/x-www-form-urlencoded'
+            },
+            success: this.handleGetMarkersSucc.bind(this)
+        })
     },
 
     handleGetMarkersSucc: function(res) {
         this.staticData.markersInfo = res.data.data;
-        console.log(this.staticData.markersInfo)
+        //console.log(this.staticData.markersInfo)
         var markers = res.data.data,
             l = markers.length,
             results = [];
